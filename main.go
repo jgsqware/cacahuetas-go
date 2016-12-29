@@ -2,33 +2,40 @@ package main
 
 import "fmt"
 
+type Users map[string]int
+
+type Couple struct {
+	Giver, Receiver string
+}
+
 func main() {
-	givers := map[string]string{
-		"Julien Garcia Gonzalez": "garciagonzalez.julien@gmail.com",
-		"Céline Liurno":          "celine.liurno@gmail.com",
-		"Ludivine":               "ludivine@gmail.com",
-		"Jeremie":                "jeremie@gmail.com",
-		"Anthony Ennen":          "anthony.ennen@gmail.com",
-		"Elisa Bono":             "elisa.bono@gmail.com",
+	givers := Users{
+		"Julien":   0,
+		"Céline":   1,
+		"Ludivine": 2,
+		"Jérémie":  3,
+		"Anthony":  4,
+		"Elisa":    5,
 	}
+
+	couples := []Couple{}
 
 	receivers := copy(givers)
 
-	fmt.Printf("givers: %v\n", givers)
-	fmt.Printf("receivers: %v\n", receivers)
-	fmt.Println("------")
-	fmt.Printf("givers size: %v\n", len(givers))
-	fmt.Println("------")
-	k, v := randomElement(receivers)
-	fmt.Printf("random item: %v:%v\n", k, v)
-
-	for name, email := range givers {
-
+	for {
+		if len(givers) == 0 {
+			break
+		}
+		couple := getCouple(givers, receivers)
+		couples = append(couples, couple)
 	}
+
+	fmt.Printf("couples: %v", couples)
+
 }
 
-func copy(originalMap map[string]string) (newMap map[string]string) {
-	newMap = make(map[string]string)
+func copy(originalMap Users) (newMap Users) {
+	newMap = make(Users, len(originalMap))
 	for k, v := range originalMap {
 		newMap[k] = v
 	}
@@ -36,8 +43,27 @@ func copy(originalMap map[string]string) (newMap map[string]string) {
 	return
 }
 
-func randomElement(m map[string]string) (k, v string) {
-	for k, v = range m {
+func getCouple(givers, receivers Users) Couple {
+	couple := Couple{}
+	couple.Giver = randomUser(givers)
+	couple.Receiver = getReceiver(couple.Giver, receivers)
+	delete(givers, couple.Giver)
+	delete(receivers, couple.Receiver)
+	return couple
+}
+
+func getReceiver(giver string, receivers Users) (receiver string) {
+	for {
+		receiver = randomUser(receivers)
+		if giver != receiver {
+			break
+		}
+	}
+	return
+}
+
+func randomUser(users Users) (user string) {
+	for user = range users {
 		break
 	}
 	return
