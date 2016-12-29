@@ -1,0 +1,12 @@
+{
+  "name": "Cacahuetas",
+  "description": "Cacahuetas",
+  "keywords": [
+    "Cacahuetas",
+    "go"
+  ],
+  "image": "heroku/go:1.6",
+  "mount_dir": "src/github.com/jgsqware/cacahuetas-go",
+  "website": "http://github.com/jgsqware/cacahuetas-go",
+  "repository": "http://github.com/jgsqware/cacahuetas-go"
+}
