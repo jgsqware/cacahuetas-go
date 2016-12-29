@@ -1,6 +1,9 @@
 package cacahuetas
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Users map[string]int
 type Restrictions map[string]string
@@ -93,7 +96,7 @@ func getReceiver(giver string, receivers Users) (receiver string, err error) {
 }
 
 func isRestricted(giver, receiver string) (restricted bool) {
-	return giver == receiver || restrictions[receiver] == giver || restrictions[giver] == receiver
+	return strings.ToUpper(giver) == strings.ToUpper(receiver) || restrictions[receiver] == giver || restrictions[giver] == receiver
 }
 
 func randomUser(users Users) (user string) {
