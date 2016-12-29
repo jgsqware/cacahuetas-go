@@ -26,7 +26,7 @@ func main() {
 	http.HandleFunc("/display/", handlerDisplay)
 	http.HandleFunc("/cacahueta/", handlerCacahueta)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.ListenAndServe(":8888", nil)
+	http.ListenAndServe(":80", nil)
 
 }
 
