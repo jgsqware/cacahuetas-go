@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"encoding/base64"
 	"encoding/json"
 
 	"github.com/jgsqware/cacahuetas-go/cacahuetas"
@@ -57,15 +58,7 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 	createDatafolder()
 	generatedURLs := make(map[string]string)
 	for _, couple := range couples {
-		uniqueID := randomID()
-		path := filepath.Join(DATAFOLDER, uniqueID)
-		err := ioutil.WriteFile(path, []byte(couple.String()), 0644)
-		if err != nil {
-			fmt.Printf("Cannot write %v", path)
-			errorPage(w)
-			return
-		}
-		generatedURLs[couple.Giver] = uniqueID
+		generatedURLs[couple.Giver] = encodeCouple(couple)
 	}
 
 	generalUniqueID := randomID()
@@ -79,6 +72,10 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/display/"+generalUniqueID, http.StatusFound)
 	return
+}
+
+func encodeCouple(couple cacahuetas.Couple) string {
+	return base64.URLEncoding.EncodeToString([]byte(couple.Giver + ":" + couple.Receiver))
 }
 
 func handlerDisplay(w http.ResponseWriter, r *http.Request) {
@@ -142,26 +139,25 @@ func parseRestrictionForm(req *http.Request) cacahuetas.Restrictions {
 	return restric
 }
 
-func handlerCacahueta(w http.ResponseWriter, r *http.Request) {
-	uniqueID := r.URL.Path[len("/cacahueta/"):]
-	path := filepath.Join(DATAFOLDER, uniqueID)
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		dat, err := ioutil.ReadFile(path)
-		if err != nil {
-			fmt.Printf("Cannot read %v", path)
-			errorPage(w)
-			return
-		}
-		c := strings.Split(string(dat), ":")
-		couple := cacahuetas.Couple{
-			Giver:    c[0],
-			Receiver: c[1],
-		}
-		t, _ := template.ParseFiles("templates/cacahueta.html")
-		t.Execute(w, couple)
-	} else {
-		notFoundPage(w)
+func decodeCouple(encoded string) (cacahuetas.Couple, error) {
+	b, err := base64.URLEncoding.DecodeString(encoded)
+	if err != nil {
+		return "", fmt.Errorf("%s is not base64", encoded)
 	}
+	scouple := strings.Split(string(b), ":")
+
+	return Couple{scouple[0], scouple[1]}, nil
+}
+
+func handlerCacahueta(w http.ResponseWriter, r *http.Request) {
+	encoded := r.URL.Path[len("/cacahueta/"):]
+	couple, err := decodeCouple(encoded)
+	if err != nil {
+		notFoundPage(w)
+		return
+	}
+	t, _ := template.ParseFiles("templates/cacahueta.html")
+	t.Execute(w, couple)
 
 }
 
