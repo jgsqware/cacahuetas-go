@@ -20,9 +20,12 @@ import (
 const ID = 12
 const DATAFOLDER = "/tmp/cacahuetas"
 
+var localURL string
+
 func main() {
 
 	port := os.Getenv("PORT")
+	localURL = os.Getenv("URL")
 
 	if port == "" {
 		log.Fatal("$PORT must be set")
@@ -93,12 +96,13 @@ func handlerDisplay(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Cannot unmarshal %v", path)
 		}
 		t, _ := template.ParseFiles("templates/display.html")
+		baseURL := localURL + "cacahueta"
 		data := struct {
 			GeneratedURLs map[string]string
 			BaseURL       string
 		}{
 			generatedURLs,
-			"https://cacahuetas.herokuapp.com/cacahueta",
+			baseURL,
 		}
 		t.Execute(w, data)
 	} else {
