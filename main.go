@@ -98,7 +98,7 @@ func handlerDisplay(w http.ResponseWriter, r *http.Request) {
 			BaseURL       string
 		}{
 			generatedURLs,
-			"http://localhost:8888/cacahueta",
+			"https://cacahuetas.herokuapp.com/cacahueta",
 		}
 		t.Execute(w, data)
 	} else {
