@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -21,12 +22,18 @@ const DATAFOLDER = "/tmp/cacahuetas"
 
 func main() {
 
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/generate", handlerGenerate)
 	http.HandleFunc("/display/", handlerDisplay)
 	http.HandleFunc("/cacahueta/", handlerCacahueta)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+port, nil)
 
 }
 
