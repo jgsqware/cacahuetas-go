@@ -142,11 +142,11 @@ func parseRestrictionForm(req *http.Request) cacahuetas.Restrictions {
 func decodeCouple(encoded string) (cacahuetas.Couple, error) {
 	b, err := base64.URLEncoding.DecodeString(encoded)
 	if err != nil {
-		return "", fmt.Errorf("%s is not base64", encoded)
+		return cacahuetas.Couple{}, fmt.Errorf("%s is not base64", encoded)
 	}
 	scouple := strings.Split(string(b), ":")
 
-	return Couple{scouple[0], scouple[1]}, nil
+	return cacahuetas.Couple{scouple[0], scouple[1]}, nil
 }
 
 func handlerCacahueta(w http.ResponseWriter, r *http.Request) {
