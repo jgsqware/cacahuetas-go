@@ -62,7 +62,8 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 		err := ioutil.WriteFile(path, []byte(couple.String()), 0644)
 		if err != nil {
 			fmt.Printf("Cannot write %v", path)
-			break
+			errorPage(w)
+			return
 		}
 		generatedURLs[couple.Giver] = uniqueID
 	}
@@ -72,8 +73,9 @@ func handlerGenerate(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(DATAFOLDER, generalUniqueID)
 	err := ioutil.WriteFile(path, []byte(string(generatedURLsJSON)), 0644)
 	if err != nil {
-		fmt.Fprintf(w, "Something wrong happened...")
 		fmt.Printf("Cannot write %v", path)
+		errorPage(w)
+		return
 	}
 	http.Redirect(w, r, "/display/"+generalUniqueID, http.StatusFound)
 	return
@@ -85,15 +87,16 @@ func handlerDisplay(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		dat, err := ioutil.ReadFile(path)
 		if err != nil {
-			fmt.Fprintf(w, "Something wrong happened...")
 			fmt.Printf("Cannot read %v", path)
+			errorPage(w)
 			return
 		}
 		var generatedURLs map[string]string
 		err = json.Unmarshal(dat, &generatedURLs)
 		if err != nil {
-			fmt.Fprintf(w, "Something wrong happened...")
 			fmt.Printf("Cannot unmarshal %v", path)
+			errorPage(w)
+			return
 		}
 		t, _ := template.ParseFiles("templates/display.html")
 		baseURL := localURL + "cacahueta"
@@ -106,9 +109,18 @@ func handlerDisplay(w http.ResponseWriter, r *http.Request) {
 		}
 		t.Execute(w, data)
 	} else {
-		fmt.Fprintf(w, "This cacahuetas generation does not exists or was revoked!")
+		notFoundPage(w)
 	}
+}
 
+func errorPage(w http.ResponseWriter) {
+	t, _ := template.ParseFiles("templates/errors.html")
+	t.Execute(w, nil)
+}
+
+func notFoundPage(w http.ResponseWriter) {
+	t, _ := template.ParseFiles("templates/404.html")
+	t.Execute(w, nil)
 }
 
 func parseUsersForm(req *http.Request) cacahuetas.Users {
@@ -136,8 +148,8 @@ func handlerCacahueta(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		dat, err := ioutil.ReadFile(path)
 		if err != nil {
-			fmt.Fprintf(w, "Something wrong happened...")
 			fmt.Printf("Cannot read %v", path)
+			errorPage(w)
 			return
 		}
 		c := strings.Split(string(dat), ":")
@@ -148,7 +160,7 @@ func handlerCacahueta(w http.ResponseWriter, r *http.Request) {
 		t, _ := template.ParseFiles("templates/cacahueta.html")
 		t.Execute(w, couple)
 	} else {
-		fmt.Fprintf(w, "This cacahueta does not exists or was revoked!")
+		notFoundPage(w)
 	}
 
 }
