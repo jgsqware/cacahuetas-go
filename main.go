@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
 	givers := map[string]string{
@@ -19,7 +17,14 @@ func main() {
 	fmt.Printf("givers: %v\n", givers)
 	fmt.Printf("receivers: %v\n", receivers)
 	fmt.Println("------")
-	fmt.Printf("givers size: %v", len(givers))
+	fmt.Printf("givers size: %v\n", len(givers))
+	fmt.Println("------")
+	k, v := randomElement(receivers)
+	fmt.Printf("random item: %v:%v\n", k, v)
+
+	for name, email := range givers {
+
+	}
 }
 
 func copy(originalMap map[string]string) (newMap map[string]string) {
@@ -28,5 +33,12 @@ func copy(originalMap map[string]string) (newMap map[string]string) {
 		newMap[k] = v
 	}
 
+	return
+}
+
+func randomElement(m map[string]string) (k, v string) {
+	for k, v = range m {
+		break
+	}
 	return
 }
